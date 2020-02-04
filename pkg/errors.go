@@ -25,14 +25,14 @@ func (me *FieldError) AddSubError(fieldError *FieldError) {
 type FieldErrors []*FieldError
 
 //Add add new error into sub errors
-func (me FieldErrors) Add(fieldError *FieldError) {
-	me = append(me, fieldError)
+func (me *FieldErrors) Add(fieldError *FieldError) {
+	*me = append(*me, fieldError)
 }
 
 //AppError represent base known error
 type AppError struct {
 	ErrorMessage string
-	Errors       []*FieldError
+	Errors       FieldErrors
 }
 
 //NewAppError return a new app error instance
