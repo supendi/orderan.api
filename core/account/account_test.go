@@ -8,6 +8,27 @@ import (
 	"github.com/supendi/orderan.api/core/account/inmem"
 )
 
+var accountService *account.Service
+var accountRepo *inmem.AccountRepository
+var newContext = context.Background()
+
+//GetAccountService singleton instance
+func GetAccountService() *account.Service {
+	if accountService == nil {
+		hasher := account.NewBCryptHasher()
+		accountService = account.NewAccountService(GetAccountRepo(), hasher)
+	}
+	return accountService
+}
+
+//GetAccountRepo singleton instance
+func GetAccountRepo() *inmem.AccountRepository {
+	if accountRepo == nil {
+		accountRepo = inmem.NewAccountRepository([]*account.Account{})
+	}
+	return accountRepo
+}
+
 func TestRegisterAccount(t *testing.T) {
 	registrant := &account.Registrant{
 		Name:     "joe",
@@ -15,11 +36,8 @@ func TestRegisterAccount(t *testing.T) {
 		Phone:    "0813",
 		Password: "",
 	}
-	accountRepo := inmem.NewAccountRepository([]*account.Account{})
-	hasher := account.NewBCryptHasher()
-	accountSvc := account.NewAccountService(accountRepo, hasher)
-	newContext := context.Background()
-	newAccount, err := accountSvc.RegisterAccount(newContext, registrant)
+
+	newAccount, err := GetAccountService().RegisterAccount(newContext, registrant)
 	if err != nil {
 		t.Fatal(err)
 	}
