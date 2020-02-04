@@ -10,7 +10,14 @@ import (
 
 //AccountRepository implements account.Repository
 type AccountRepository struct {
-	db dbx.Context
+	db *dbx.Context
+}
+
+//NewAccountRepository returns a new Account Repository instance
+func NewAccountRepository(dbContext *dbx.Context) *AccountRepository {
+	return &AccountRepository{
+		db: dbContext,
+	}
 }
 
 //Add a new account into storage

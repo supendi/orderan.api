@@ -12,6 +12,13 @@ type AccountRepository struct {
 	accounts []*account.Account
 }
 
+//NewAccountRepository returns a new Account Repository instance
+func NewAccountRepository(accounts []*account.Account) *AccountRepository {
+	return &AccountRepository{
+		accounts: accounts,
+	}
+}
+
 //Add a new account to memory
 func (me *AccountRepository) Add(ctx context.Context, newAccount *account.Account) (*account.Account, error) {
 	newAccount.ID = uuid.New().String()
