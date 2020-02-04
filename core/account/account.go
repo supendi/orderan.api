@@ -46,6 +46,14 @@ type Service struct {
 	passwordHasher PasswordHasher
 }
 
+//NewAccountService return new intance of account service
+func NewAccountService(accountRepo Repository, passwordHasher PasswordHasher) *Service {
+	return &Service{
+		accountRepo:    accountRepo,
+		passwordHasher: passwordHasher,
+	}
+}
+
 //RegisterAccount registers a new account
 func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) (*Account, error) {
 	existingAccount, err := me.accountRepo.GetByEmail(ctx, registrant.Email)
