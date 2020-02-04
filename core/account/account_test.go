@@ -49,3 +49,45 @@ func TestRegisterAccount(t *testing.T) {
 		t.Fatal("New account ID should be not empty")
 	}
 }
+
+func TestRegisterAccountFailDuplicateEmail(t *testing.T) {
+	registrant1 := &account.Registrant{
+		Name:     "Joe",
+		Email:    "joe@gmail.com",
+		Phone:    "0813",
+		Password: "",
+	}
+	registrant2 := &account.Registrant{
+		Name:     "John",
+		Email:    "joe@gmail.com",
+		Phone:    "0813",
+		Password: "",
+	}
+
+	_, err := GetAccountService().RegisterAccount(newContext, registrant1)
+	_, err = GetAccountService().RegisterAccount(newContext, registrant2)
+	if err == nil {
+		t.Fatal("Should return err caused by duplicate email")
+	}
+}
+
+func TestRegisterAccountFailDuplicatePhone(t *testing.T) {
+	registrant1 := &account.Registrant{
+		Name:     "Joe",
+		Email:    "joe@gmail.com",
+		Phone:    "0813",
+		Password: "",
+	}
+	registrant2 := &account.Registrant{
+		Name:     "John",
+		Email:    "john@gmail.com",
+		Phone:    "0813",
+		Password: "",
+	}
+
+	_, err := GetAccountService().RegisterAccount(newContext, registrant1)
+	_, err = GetAccountService().RegisterAccount(newContext, registrant2)
+	if err == nil {
+		t.Fatal("Should return err caused by duplicate phone")
+	}
+}
