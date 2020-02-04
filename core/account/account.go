@@ -3,6 +3,8 @@ package account
 import (
 	"context"
 	"time"
+
+	"github.com/supendi/orderan.api/pkg"
 )
 
 //Account represent account entity model
@@ -27,7 +29,9 @@ type Registrant struct {
 
 //Repository specify the functionalities of account data storage
 type Repository interface {
-	Add(account *Account) (*Account, error)
+	Add(ctx context.Context, account *Account) (*Account, error)
+	GetByEmail(ctx context.Context, email string) (*Account, error)
+	GetByPhone(ctx context.Context, phone string) (*Account, error)
 }
 
 //PasswordHasher specify password hasher functions contract
@@ -44,6 +48,22 @@ type Service struct {
 
 //RegisterAccount registers a new account
 func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) (*Account, error) {
+	existingAccount, err := me.accountRepo.GetByEmail(ctx, registrant.Email)
+	if err != nil {
+		return nil, err
+	}
+	if existingAccount != nil {
+		return nil, pkg.NewAppError("Email '" + registrant.Email + "' is already registered.")
+	}
+
+	existingAccount, err = me.accountRepo.GetByPhone(ctx, registrant.Phone)
+	if err != nil {
+		return nil, err
+	}
+	if existingAccount != nil {
+		return nil, pkg.NewAppError("Phone number '" + registrant.Email + "' is already registered.")
+	}
+
 	newAccount := &Account{
 		Name:     registrant.Name,
 		Email:    registrant.Email,
@@ -57,7 +77,7 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 	}
 	newAccount.Password = hashedPassword
 
-	addedAccount, err := me.accountRepo.Add(newAccount)
+	addedAccount, err := me.accountRepo.Add(ctx, newAccount)
 	if err != nil {
 		return nil, err
 	}

@@ -21,6 +21,14 @@ func (me *FieldError) AddSubError(fieldError *FieldError) {
 	me.SubErrors = append(me.SubErrors, fieldError)
 }
 
+//FieldErrors represent a multiple field error
+type FieldErrors []*FieldError
+
+//Add add new error into sub errors
+func (me FieldErrors) Add(fieldError *FieldError) {
+	me = append(me, fieldError)
+}
+
 //AppError represent base known error
 type AppError struct {
 	ErrorMessage string
