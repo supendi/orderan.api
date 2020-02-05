@@ -129,7 +129,7 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 }
 
 //UpdateAccount updates an existing account, but only its name will be updated
-func (me *Service) UpdateAccount(ctx context.Context, updateRequest UpdateRequest) (*Account, error) {
+func (me *Service) UpdateAccount(ctx context.Context, updateRequest *UpdateRequest) (*Account, error) {
 	existingAccount, err := me.accountRepo.GetByID(ctx, updateRequest.ID)
 	if err != nil {
 		return nil, err
@@ -145,10 +145,13 @@ func (me *Service) UpdateAccount(ctx context.Context, updateRequest UpdateReques
 }
 
 //GetAccount gets an account by its ID
-func (me *Service) GetAccount(ctx context.Context, request GetRequest) (*Account, error) {
+func (me *Service) GetAccount(ctx context.Context, request *GetRequest) (*Account, error) {
 	existingAccount, err := me.accountRepo.GetByID(ctx, request.ID)
 	if err != nil {
 		return nil, err
+	}
+	if existingAccount == nil {
+		return nil, errors.NewAppError("Account with id '" + request.ID + "' is not found")
 	}
 
 	return existingAccount, nil

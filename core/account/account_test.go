@@ -107,7 +107,7 @@ func TestUpdateAccount(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	updateRequest := account.UpdateRequest{
+	updateRequest := &account.UpdateRequest{
 		ID:   newAccount.ID,
 		Name: "Joe Haskell",
 	}
@@ -147,7 +147,7 @@ func TestGetAccount(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	getRequest := account.GetRequest{
+	getRequest := &account.GetRequest{
 		ID: newAccount.ID,
 	}
 

@@ -3,6 +3,7 @@ package httphelper
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 
 	"github.com/supendi/orderan.api/pkg/errors"
 )
@@ -27,7 +28,7 @@ func (me *ResponseHandler) Write(httpSuccessStatus int, result interface{}, err 
 //WriteResponse write json response
 func WriteResponse(httpStatus int, v interface{}, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
-	if v == nil {
+	if v == nil || reflect.ValueOf(v).IsNil() {
 		w.WriteHeader(httpStatus)
 		w.Write([]byte{})
 		return

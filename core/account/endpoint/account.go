@@ -1,4 +1,4 @@
-package controller
+package endpoint
 
 import (
 	"net/http"
@@ -34,27 +34,22 @@ func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account,
 	return registeredAccount, err
 }
 
-//AccountRoute register account controller functionalities to a spesific end point
-type AccountRoute struct {
-	router         *chi.Mux
-	responseWriter httphelper.ResponseWriter
-	accountCtrl    *AccountController
+//GetAccount gets an existing Account
+func (me *AccountController) GetAccount(r *http.Request) (*account.Account, error) {
+	var getRequest = &account.GetRequest{}
+	getRequest.ID = me.requestDecoder.URLParam(r, "account_id")
+	registeredAccount, err := me.accountService.GetAccount(r.Context(), getRequest)
+	return registeredAccount, err
 }
 
 //RegisterRoutes register all account routes
 func RegisterRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, accountCtrl *AccountController) {
-	route := &AccountRoute{
-		router:         router,
-		responseWriter: responseWriter,
-		accountCtrl:    accountCtrl,
-	}
-	route.RegisterAccount()
-}
-
-//RegisterAccount register account route handler
-func (me *AccountRoute) RegisterAccount() {
-	me.router.Post("/accounts", func(w http.ResponseWriter, r *http.Request) {
-		accountInfo, err := me.accountCtrl.RegisterAccount(r)
-		me.responseWriter.Write(200, accountInfo, err, w)
+	router.Post("/accounts", func(w http.ResponseWriter, r *http.Request) {
+		accountInfo, err := accountCtrl.RegisterAccount(r)
+		responseWriter.Write(200, accountInfo, err, w)
+	})
+	router.Post("/accounts/{account_id}", func(w http.ResponseWriter, r *http.Request) {
+		accountInfo, err := accountCtrl.GetAccount(r)
+		responseWriter.Write(200, accountInfo, err, w)
 	})
 }
