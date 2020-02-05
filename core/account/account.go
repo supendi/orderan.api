@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/supendi/orderan.api/pkg"
+	"github.com/supendi/orderan.api/pkg/errors"
 )
 
 //Models
@@ -46,18 +46,6 @@ type (
 	}
 )
 
-//ErrDuplicateEmail represent duplicate email error
-type ErrDuplicateEmail struct {
-	*pkg.AppError
-}
-
-//NewErrDuplicateEmail return a new duplicate email error
-func NewErrDuplicateEmail(email string) *ErrDuplicateEmail {
-	return &ErrDuplicateEmail{
-		AppError: pkg.NewAppError("Email '" + email + "' is already registered."),
-	}
-}
-
 //Service provide the account bussines functionalities such as create a new account, update and delete.
 type Service struct {
 	accountRepo    Repository
@@ -79,7 +67,7 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 		return nil, err
 	}
 	if existingAccount != nil {
-		return nil, NewErrDuplicateEmail(registrant.Email)
+		return nil, errors.NewAppError("Email '" + registrant.Email + "' is already registered.")
 	}
 
 	existingAccount, err = me.accountRepo.GetByPhone(ctx, registrant.Phone)
@@ -87,7 +75,7 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 		return nil, err
 	}
 	if existingAccount != nil {
-		return nil, pkg.NewAppError("Phone number '" + registrant.Email + "' is already registered.")
+		return nil, errors.NewAppError("Phone number '" + registrant.Phone + "' is already registered.")
 	}
 
 	newAccount := &Account{

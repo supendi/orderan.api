@@ -1,4 +1,9 @@
-package pkg
+package errors
+
+import (
+	"reflect"
+	"strings"
+)
 
 // FieldError Represent field error. Provides the field name which error is, and the error message
 type FieldError struct {
@@ -45,4 +50,18 @@ func NewAppError(errorMessage string) *AppError {
 //Error return the error message
 func (me *AppError) Error() string {
 	return me.ErrorMessage
+}
+
+//IsAppError checks if an error type is AppError
+func IsAppError(err error) bool {
+	t := reflect.TypeOf(err).String()
+	t = strings.ReplaceAll(t, "*", "") //just ignore pointer type
+	typeName := "errors.AppError"
+	return t == typeName
+}
+
+//TypeName return the error type name string
+func TypeName(err error) string {
+	t := reflect.TypeOf(err).String()
+	return t
 }

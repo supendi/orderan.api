@@ -6,6 +6,7 @@ import (
 
 	"github.com/supendi/orderan.api/core/account"
 	"github.com/supendi/orderan.api/core/account/inmem"
+	"github.com/supendi/orderan.api/pkg/errors"
 )
 
 var accountService *account.Service
@@ -66,8 +67,9 @@ func TestRegisterAccountFailDuplicateEmail(t *testing.T) {
 
 	_, err := GetAccountService().RegisterAccount(newContext, registrant1)
 	_, err = GetAccountService().RegisterAccount(newContext, registrant2)
-	if err == nil {
-		t.Fatal("Should return err caused by duplicate email")
+
+	if !errors.IsAppError(err) {
+		t.Fatal("Should return an AppError type")
 	}
 }
 
@@ -87,7 +89,8 @@ func TestRegisterAccountFailDuplicatePhone(t *testing.T) {
 
 	_, err := GetAccountService().RegisterAccount(newContext, registrant1)
 	_, err = GetAccountService().RegisterAccount(newContext, registrant2)
-	if err == nil {
-		t.Fatal("Should return err caused by duplicate phone")
+
+	if !errors.IsAppError(err) {
+		t.Fatal("Should return an AppError type")
 	}
 }
