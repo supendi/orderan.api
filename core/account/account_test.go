@@ -137,9 +137,9 @@ func TestUpdateAccount(t *testing.T) {
 
 func TestGetAccount(t *testing.T) {
 	registrant1 := &account.Registrant{
-		Name:     "Andrew",
-		Email:    "andrew@gmail.com",
-		Phone:    "0815",
+		Name:     "Xena",
+		Email:    "xena@gmail.com",
+		Phone:    "0817",
 		Password: "myStrongPassword",
 	}
 	newAccount, err := GetAccountService().RegisterAccount(newContext, registrant1)
