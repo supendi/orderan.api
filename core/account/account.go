@@ -45,6 +45,11 @@ type (
 		ID   string
 		Name string
 	}
+
+	//GetRequest represent account get request model
+	GetRequest struct {
+		ID string
+	}
 )
 
 //Interfaces
@@ -53,7 +58,7 @@ type (
 	Repository interface {
 		Add(ctx context.Context, account *Account) (*Account, error)
 		Update(ctx context.Context, account *Account) (*Account, error)
-		GetByID(ctx context.Context, id string) (*Account, error)
+		GetByID(ctx context.Context, accountID string) (*Account, error)
 		GetByEmail(ctx context.Context, email string) (*Account, error)
 		GetByPhone(ctx context.Context, phone string) (*Account, error)
 	}
@@ -132,4 +137,14 @@ func (me *Service) UpdateAccount(ctx context.Context, updateRequest UpdateReques
 		return nil, err
 	}
 	return updatedAccount, nil
+}
+
+//GetAccount gets an account by its ID
+func (me *Service) GetAccount(ctx context.Context, request GetRequest) (*Account, error) {
+	existingAccount, err := me.accountRepo.GetByID(ctx, request.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return existingAccount, nil
 }

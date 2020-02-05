@@ -134,3 +134,29 @@ func TestUpdateAccount(t *testing.T) {
 		t.Fatalf("Account's password should not be changed. It must be %s but got %s", newAccount.Password, existingAccount.Password)
 	}
 }
+
+func TestGetAccount(t *testing.T) {
+	registrant1 := &account.Registrant{
+		Name:     "Andrew",
+		Email:    "andrew@gmail.com",
+		Phone:    "0815",
+		Password: "myStrongPassword",
+	}
+	newAccount, err := GetAccountService().RegisterAccount(newContext, registrant1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	getRequest := account.GetRequest{
+		ID: newAccount.ID,
+	}
+
+	existingAccount, err := GetAccountService().GetAccount(newContext, getRequest)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if existingAccount == nil {
+		t.Fatal("Account must be not nil")
+	}
+}
