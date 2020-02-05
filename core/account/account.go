@@ -21,12 +21,29 @@ type (
 		DeletedAt *time.Time
 	}
 
+	//AccountInfo is an account model, but without password
+	AccountInfo struct {
+		ID        string
+		Name      string
+		Email     string
+		Phone     string
+		CreatedAt time.Time
+		UpdatedAt *time.Time
+		DeletedAt *time.Time
+	}
+
 	//Registrant represent a registrant data model who wants to register as a new account
 	Registrant struct {
 		Name     string
 		Email    string
 		Phone    string
 		Password string
+	}
+
+	//UpdateRequest represent account update request model
+	UpdateRequest struct {
+		ID   string
+		Name string
 	}
 )
 
@@ -35,6 +52,8 @@ type (
 	//Repository specify the functionalities of account data storage
 	Repository interface {
 		Add(ctx context.Context, account *Account) (*Account, error)
+		Update(ctx context.Context, account *Account) (*Account, error)
+		GetByID(ctx context.Context, id string) (*Account, error)
 		GetByEmail(ctx context.Context, email string) (*Account, error)
 		GetByPhone(ctx context.Context, phone string) (*Account, error)
 	}
@@ -97,4 +116,20 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 	}
 
 	return addedAccount, nil
+}
+
+//UpdateAccount updates an existing account, but only its name will be updated
+func (me *Service) UpdateAccount(ctx context.Context, updateRequest UpdateRequest) (*Account, error) {
+	existingAccount, err := me.accountRepo.GetByID(ctx, updateRequest.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	existingAccount.Name = updateRequest.Name
+
+	updatedAccount, err := me.accountRepo.Update(ctx, existingAccount)
+	if err != nil {
+		return nil, err
+	}
+	return updatedAccount, nil
 }

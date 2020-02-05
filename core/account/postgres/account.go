@@ -40,6 +40,44 @@ func (me *AccountRepository) Add(ctx context.Context, newAccount *account.Accoun
 	return newAccount, nil
 }
 
+//Update updates an existing account in storage
+func (me *AccountRepository) Update(ctx context.Context, updatedAccount *account.Account) (*account.Account, error) {
+	statement := dbx.NewStatement("UPDATE account SET name=:name, updated_at = NOW()")
+	statement.AddParameter("name", updatedAccount.Name)
+
+	_, err := me.db.SaveChanges(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedAccount, nil
+}
+
+//GetByID returns an account by ID
+func (me *AccountRepository) GetByID(ctx context.Context, id string) (*account.Account, error) {
+	statement := dbx.NewStatement("SELECT * FROM account WHERE id = :id")
+	statement.AddParameter("id", id)
+
+	rows, err := me.db.QueryStatementContext(ctx, statement)
+	if err != nil {
+		return nil, err
+	}
+
+	var retrievedAccount *account.Account
+
+	for rows.Next() {
+		retrievedAccount = &account.Account{}
+		err := rows.Scan(&retrievedAccount.ID, &retrievedAccount.Name, &retrievedAccount.Email, &retrievedAccount.Phone, &retrievedAccount.Password, &retrievedAccount.CreatedAt, &retrievedAccount.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		return retrievedAccount, nil
+	}
+
+	return nil, nil
+}
+
 //GetByEmail returns an account by email
 func (me *AccountRepository) GetByEmail(ctx context.Context, email string) (*account.Account, error) {
 	statement := dbx.NewStatement("SELECT * FROM account WHERE email = :email")

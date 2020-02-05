@@ -94,3 +94,43 @@ func TestRegisterAccountFailDuplicatePhone(t *testing.T) {
 		t.Fatal("Should return an AppError type")
 	}
 }
+
+func TestUpdateAccount(t *testing.T) {
+	registrant1 := &account.Registrant{
+		Name:     "Andrew",
+		Email:    "andrew@gmail.com",
+		Phone:    "0815",
+		Password: "myStrongPassword",
+	}
+	newAccount, err := GetAccountService().RegisterAccount(newContext, registrant1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	updateRequest := account.UpdateRequest{
+		ID:   newAccount.ID,
+		Name: "Joe Haskell",
+	}
+
+	_, err = GetAccountService().UpdateAccount(newContext, updateRequest)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	existingAccount, err := GetAccountRepo().GetByID(newContext, newAccount.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if existingAccount.Name != updateRequest.Name {
+		t.Fatalf("New account's name should be %s but got %s", updateRequest.Name, existingAccount.Name)
+	}
+	if existingAccount.Email != newAccount.Email {
+		t.Fatalf("Account's email should not be changed. It must be %s but got %s", newAccount.Email, existingAccount.Email)
+	}
+	if existingAccount.Phone != newAccount.Phone {
+		t.Fatalf("Account's Phone should not be changed. It must be %s but got %s", newAccount.Phone, existingAccount.Phone)
+	}
+	if existingAccount.Password != newAccount.Password {
+		t.Fatalf("Account's password should not be changed. It must be %s but got %s", newAccount.Password, existingAccount.Password)
+	}
+}
