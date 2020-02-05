@@ -48,7 +48,7 @@ func RegisterRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, a
 		accountInfo, err := accountCtrl.RegisterAccount(r)
 		responseWriter.Write(200, accountInfo, err, w)
 	})
-	router.Post("/accounts/{account_id}", func(w http.ResponseWriter, r *http.Request) {
+	router.Get("/accounts/{account_id}", func(w http.ResponseWriter, r *http.Request) {
 		accountInfo, err := accountCtrl.GetAccount(r)
 		responseWriter.Write(200, accountInfo, err, w)
 	})
