@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-//AccountController wrap account service for http layer
+//AccountController entry point and wrap account service for http layer
 type AccountController struct {
 	requestDecoder httphelper.RequestDecoder
 	accountService *account.Service
@@ -34,7 +34,7 @@ func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account,
 	return registeredAccount, err
 }
 
-//AccountRoute entry point of account service
+//AccountRoute register account controller functionalities to a spesific end point
 type AccountRoute struct {
 	router         *chi.Mux
 	responseWriter httphelper.ResponseWriter
