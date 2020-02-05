@@ -11,26 +11,26 @@ import (
 type (
 	//Account represent account entity model
 	Account struct {
-		ID        string
-		Name      string
-		Email     string
-		Phone     string
-		Password  string
-		CreatedAt time.Time
-		UpdatedAt *time.Time
-		DeletedAt *time.Time
+		ID        string     `json:"id"`
+		Name      string     `json:"name"`
+		Email     string     `json:"email"`
+		Phone     string     `json:"phone"`
+		Password  string     `json:"-"`
+		CreatedAt time.Time  `json:"createdAt"`
+		UpdatedAt *time.Time `json:"updatedAt"`
+		DeletedAt *time.Time `json:"deletedAt"`
 	}
 
-	//AccountInfo is an account model, but without password
-	AccountInfo struct {
-		ID        string
-		Name      string
-		Email     string
-		Phone     string
-		CreatedAt time.Time
-		UpdatedAt *time.Time
-		DeletedAt *time.Time
-	}
+	// //AccountInfo is an account model, but without password
+	// AccountInfo struct {
+	// 	ID        string     `json:id`
+	// 	Name      string     `json:name`
+	// 	Email     string     `json:email`
+	// 	Phone     string     `json:phone`
+	// 	CreatedAt time.Time  `json:createdAt`
+	// 	UpdatedAt *time.Time `json:updatedAt`
+	// 	DeletedAt *time.Time `json:deletedAt`
+	// }
 
 	//Registrant represent a registrant data model who wants to register as a new account
 	Registrant struct {
@@ -103,10 +103,11 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 	}
 
 	newAccount := &Account{
-		Name:     registrant.Name,
-		Email:    registrant.Email,
-		Phone:    registrant.Phone,
-		Password: registrant.Password,
+		Name:      registrant.Name,
+		Email:     registrant.Email,
+		Phone:     registrant.Phone,
+		Password:  registrant.Password,
+		CreatedAt: time.Now(),
 	}
 
 	hashedPassword, err := me.passwordHasher.Hash(newAccount.Password)

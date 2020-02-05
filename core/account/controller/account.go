@@ -3,32 +3,58 @@ package controller
 import (
 	"net/http"
 
-	"github.com/go-chi/chi"
-	accountHttp "github.com/supendi/orderan.api/core/account/http"
+	"github.com/supendi/orderan.api/core/account"
 	"github.com/supendi/orderan.api/pkg/httphelper"
+
+	"github.com/go-chi/chi"
 )
 
-//AccountController entry point of account service
+//AccountController wrap account service for http layer
 type AccountController struct {
-	responseWriter httphelper.ResponseWriter
-	accountHTTP    *accountHttp.AccountHttp
+	requestDecoder httphelper.RequestDecoder
+	accountService *account.Service
+}
+
+//NewAccountController returns a new account http instance
+func NewAccountController(requestDecoder httphelper.RequestDecoder, accountService *account.Service) *AccountController {
+	return &AccountController{
+		requestDecoder: requestDecoder,
+		accountService: accountService,
+	}
+}
+
+//RegisterAccount register new Account
+func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account, error) {
+	var registrant account.Registrant
+	err := me.requestDecoder.Decode(r, &registrant)
+	if err != nil {
+		return nil, err
+	}
+	registeredAccount, err := me.accountService.RegisterAccount(r.Context(), &registrant)
+	return registeredAccount, err
+}
+
+//AccountRoute entry point of account service
+type AccountRoute struct {
 	router         *chi.Mux
+	responseWriter httphelper.ResponseWriter
+	accountCtrl    *AccountController
 }
 
 //RegisterRoutes register all account routes
-func RegisterRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, accountHTTP *accountHttp.AccountHttp) {
-	controller := &AccountController{
+func RegisterRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, accountCtrl *AccountController) {
+	route := &AccountRoute{
 		router:         router,
 		responseWriter: responseWriter,
-		accountHTTP:    accountHTTP,
+		accountCtrl:    accountCtrl,
 	}
-	controller.RegisterAccount()
+	route.RegisterAccount()
 }
 
 //RegisterAccount register account route handler
-func (me *AccountController) RegisterAccount() {
+func (me *AccountRoute) RegisterAccount() {
 	me.router.Post("/accounts", func(w http.ResponseWriter, r *http.Request) {
-		_, err := me.accountHTTP.RegisterAccount(r)
-		me.responseWriter.Write(200, nil, err, w)
+		accountInfo, err := me.accountCtrl.RegisterAccount(r)
+		me.responseWriter.Write(200, accountInfo, err, w)
 	})
 }

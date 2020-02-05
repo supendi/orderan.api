@@ -5,8 +5,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/supendi/orderan.api/core/account"
-	accountController "github.com/supendi/orderan.api/core/account/controller"
-	accountHttp "github.com/supendi/orderan.api/core/account/http"
+	"github.com/supendi/orderan.api/core/account/controller"
 	"github.com/supendi/orderan.api/core/account/inmem"
 
 	"github.com/supendi/orderan.api/pkg/httphelper"
@@ -17,8 +16,8 @@ func main() {
 	hasher := account.NewBCryptHasher()
 	accountRepo := inmem.NewAccountRepository([]*account.Account{})
 	accountService := account.NewAccountService(accountRepo, hasher)
-	accountHTTP := accountHttp.NewAccountHTTP(&httphelper.RequestHandler{}, accountService)
-	accountController.RegisterRoutes(r, &httphelper.ResponseHandler{}, accountHTTP)
+	accountController := controller.NewAccountController(&httphelper.RequestHandler{}, accountService)
+	controller.RegisterRoutes(r, &httphelper.ResponseHandler{}, accountController)
 
 	http.ListenAndServe(":8080", r)
 }
