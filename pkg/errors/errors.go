@@ -7,9 +7,9 @@ import (
 
 // FieldError Represent field error. Provides the field name which error is, and the error message
 type FieldError struct {
-	Field     string
-	Message   string
-	SubErrors []*FieldError
+	Field     string        `json:"field"`
+	Message   string        `json:"message"`
+	SubErrors []*FieldError `json:"subErrors"`
 }
 
 //NewFieldError returns a new field error instance
@@ -36,20 +36,21 @@ func (me *FieldErrors) Add(fieldError *FieldError) {
 
 //AppError represent base known error
 type AppError struct {
-	ErrorMessage string
-	Errors       FieldErrors
+	Message string      `json:"message"`
+	Errors  FieldErrors `json:"errors"`
 }
 
 //NewAppError return a new app error instance
 func NewAppError(errorMessage string) *AppError {
 	return &AppError{
-		ErrorMessage: errorMessage,
+		Message: errorMessage,
+		Errors:  []*FieldError{},
 	}
 }
 
 //Error return the error message
 func (me *AppError) Error() string {
-	return me.ErrorMessage
+	return me.Message
 }
 
 //IsAppError checks if an error type is AppError

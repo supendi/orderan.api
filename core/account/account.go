@@ -91,7 +91,9 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 		return nil, err
 	}
 	if existingAccount != nil {
-		return nil, errors.NewAppError("Email '" + registrant.Email + "' is already registered.")
+		appErr := errors.NewAppError("Validation error(s) occured.")
+		appErr.Errors.Add(errors.NewFieldError("email", "Email '"+registrant.Email+"' is already registered."))
+		return nil, appErr
 	}
 
 	existingAccount, err = me.accountRepo.GetByPhone(ctx, registrant.Phone)
@@ -99,7 +101,9 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 		return nil, err
 	}
 	if existingAccount != nil {
-		return nil, errors.NewAppError("Phone number '" + registrant.Phone + "' is already registered.")
+		appErr := errors.NewAppError("Validation error(s) occured.")
+		appErr.Errors.Add(errors.NewFieldError("phone", "Phone '"+registrant.Phone+"' is already registered."))
+		return nil, appErr
 	}
 
 	newAccount := &Account{
