@@ -124,7 +124,9 @@ func (me *Service) UpdateAccount(ctx context.Context, updateRequest *UpdateReque
 		return nil, err
 	}
 	if existingAccount == nil {
-		return nil, errors.NewAppError("Account with id '" + updateRequest.AccountID + "' is not found")
+		appErr := errors.NewAppError("Validation error(s) occured.")
+		appErr.Errors.Add(errors.NewFieldError("accountId", "Account with id '"+updateRequest.AccountID+"' is not found"))
+		return nil, appErr
 	}
 
 	existingAccount.Name = updateRequest.Name
@@ -143,7 +145,9 @@ func (me *Service) GetAccount(ctx context.Context, request *GetRequest) (*Accoun
 		return nil, err
 	}
 	if existingAccount == nil {
-		return nil, errors.NewAppError("Account with id '" + request.AccountID + "' is not found")
+		appErr := errors.NewAppError("Validation error(s) occured.")
+		appErr.Errors.Add(errors.NewFieldError("accountId", "Account with id '"+request.AccountID+"' is not found"))
+		return nil, appErr
 	}
 
 	return existingAccount, nil
