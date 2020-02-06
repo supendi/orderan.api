@@ -51,12 +51,6 @@ type (
 		AccessToken  string
 		RefreshToken string
 	}
-
-	//TokenInfo represent the response model when user successfully authenticated
-	TokenInfo struct {
-		AccessToken  string
-		RefreshToken string
-	}
 )
 
 type (
@@ -68,54 +62,14 @@ type (
 		GetByID(ctx context.Context, tokenID string) (*Token, error)
 		GetByRefreshToken(ctx context.Context, refreshToken string) (*Token, error)
 	}
-
-	//SecurityTokenHandler specifies the functionalties contract of token handler
-	SecurityTokenHandler interface {
-		GenerateAccessToken(account *Account) (string, error)
-		GenerateRefreshToken() (string, error)
-		GetSubValue(accessToken string) (string, error)
-	}
 )
 
 //AuthService specifies the functionalies user authentication
 type AuthService struct {
+	tokenService      TokenService
 	accountRepository Repository
 	tokenRepository   TokenRepository
 	passwordHasher    PasswordHasher
-	tokenHandler      SecurityTokenHandler
-}
-
-//generateTokenInfo Generates a new token info
-func (me *AuthService) generateTokenInfo(ctx context.Context, account *Account) (*TokenInfo, error) {
-	refreshToken, err := me.tokenHandler.GenerateRefreshToken()
-	if err != nil {
-		return nil, err
-	}
-
-	accessToken, err := me.tokenHandler.GenerateAccessToken(account)
-	if err != nil {
-		return nil, err
-	}
-
-	now := time.Now()
-
-	_, err = me.tokenRepository.Add(ctx, &Token{
-		AccessToken:    accessToken,
-		RefreshToken:   refreshToken,
-		RequestedCount: 0,
-		Blacklisted:    false,
-		CreatedAt:      now,
-		ExpiredAt:      now.Add(time.Duration(120) * time.Hour), //5 days
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	tokenInfo := &TokenInfo{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-	}
-	return tokenInfo, nil
 }
 
 //Authenticate authenticates user
@@ -143,7 +97,22 @@ func (me *AuthService) Authenticate(ctx context.Context, req *LoginRequest) (*To
 	if !passwordIsValid {
 		return nil, AuthError()
 	}
-	tokenInfo, err := me.generateTokenInfo(ctx, existingAccount)
+
+	tokenInfo, err := me.tokenService.GenerateTokenInfo(ctx, existingAccount)
+	if err != nil {
+		return nil, err
+	}
+
+	now := time.Now()
+	_, err = me.tokenRepository.Add(ctx, &Token{
+		AccessToken:    tokenInfo.AccessToken,
+		RefreshToken:   tokenInfo.RefreshToken,
+		RequestedCount: 0,
+		Blacklisted:    false,
+		CreatedAt:      now,
+		ExpiredAt:      now.Add(time.Duration(120) * time.Hour), //5 days
+	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +138,7 @@ func (me *AuthService) RenewAccessToken(ctx context.Context, req *RenewTokenRequ
 		return nil, ExpiredTokenError()
 	}
 
-	accountID, err := me.tokenHandler.GetSubValue(req.AccessToken)
+	accountID, err := me.tokenService.GetAccountID(req.AccessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +150,17 @@ func (me *AuthService) RenewAccessToken(ctx context.Context, req *RenewTokenRequ
 		return nil, AccountNotFoundError(accountID)
 	}
 
-	tokenInfo, err := me.generateTokenInfo(ctx, existingAccount)
+	tokenInfo, err := me.tokenService.GenerateTokenInfo(ctx, existingAccount)
+	now := time.Now()
+	_, err = me.tokenRepository.Add(ctx, &Token{
+		AccessToken:    tokenInfo.AccessToken,
+		RefreshToken:   tokenInfo.RefreshToken,
+		RequestedCount: 0,
+		Blacklisted:    false,
+		CreatedAt:      now,
+		ExpiredAt:      now.Add(time.Duration(120) * time.Hour), //5 days
+	})
+
 	if err != nil {
 		return nil, err
 	}
