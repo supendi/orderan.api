@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -62,18 +63,30 @@ func (me *AccountController) UpdateAccount(r *http.Request) (*account.Account, e
 	return me.accountService.UpdateAccount(r.Context(), &updateRequest)
 }
 
+func mw(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Print("asd")
+		//Decrypt jwt token here
+		next.ServeHTTP(w, r)
+	})
+}
+
 //RegisterRoutes register all account routes
 func RegisterRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, accountCtrl *AccountController) {
+
 	router.Post("/accounts", func(w http.ResponseWriter, r *http.Request) {
 		accountInfo, err := accountCtrl.RegisterAccount(r)
 		responseWriter.Write(200, accountInfo, err, w)
 	})
-	router.Get("/accounts/{accountId}", func(w http.ResponseWriter, r *http.Request) {
-		accountInfo, err := accountCtrl.GetAccount(r)
-		responseWriter.Write(200, accountInfo, err, w)
-	})
-	router.Put("/accounts/{accountId}", func(w http.ResponseWriter, r *http.Request) {
-		accountInfo, err := accountCtrl.UpdateAccount(r)
-		responseWriter.Write(200, accountInfo, err, w)
+	router.Group(func(r chi.Router) {
+		r.Use(mw)
+		r.Get("/accounts/{accountId}", func(w http.ResponseWriter, request *http.Request) {
+			accountInfo, err := accountCtrl.GetAccount(request)
+			responseWriter.Write(200, accountInfo, err, w)
+		})
+		r.Put("/accounts/{accountId}", func(w http.ResponseWriter, request *http.Request) {
+			accountInfo, err := accountCtrl.UpdateAccount(request)
+			responseWriter.Write(200, accountInfo, err, w)
+		})
 	})
 }

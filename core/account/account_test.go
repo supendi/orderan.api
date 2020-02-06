@@ -108,8 +108,8 @@ func TestUpdateAccount(t *testing.T) {
 	}
 
 	updateRequest := &account.UpdateRequest{
-		ID:   newAccount.ID,
-		Name: "Joe Haskell",
+		AccountID: newAccount.ID,
+		Name:      "Joe Haskell",
 	}
 
 	_, err = GetAccountService().UpdateAccount(newContext, updateRequest)
@@ -148,7 +148,7 @@ func TestGetAccount(t *testing.T) {
 	}
 
 	getRequest := &account.GetRequest{
-		ID: newAccount.ID,
+		AccountID: newAccount.ID,
 	}
 
 	existingAccount, err := GetAccountService().GetAccount(newContext, getRequest)
