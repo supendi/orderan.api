@@ -36,10 +36,20 @@ func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account,
 
 //GetAccount gets an existing Account
 func (me *AccountController) GetAccount(r *http.Request) (*account.Account, error) {
-	var getRequest = &account.GetRequest{}
-	getRequest.ID = me.requestDecoder.URLParam(r, "account_id")
-	registeredAccount, err := me.accountService.GetAccount(r.Context(), getRequest)
-	return registeredAccount, err
+	getRequest := &account.GetRequest{}
+	getRequest.ID = me.requestDecoder.URLParam(r, "accountId")
+	return me.accountService.GetAccount(r.Context(), getRequest)
+}
+
+//UpdateAccount updates an existing account
+func (me *AccountController) UpdateAccount(r *http.Request) (*account.Account, error) {
+	var updateRequest account.UpdateRequest
+	err := me.requestDecoder.Decode(r, &updateRequest)
+	if err != nil {
+		return nil, err
+	}
+	updateRequest.ID = me.requestDecoder.URLParam(r, "accountId")
+	return me.accountService.UpdateAccount(r.Context(), &updateRequest)
 }
 
 //RegisterRoutes register all account routes
@@ -48,8 +58,12 @@ func RegisterRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, a
 		accountInfo, err := accountCtrl.RegisterAccount(r)
 		responseWriter.Write(200, accountInfo, err, w)
 	})
-	router.Get("/accounts/{account_id}", func(w http.ResponseWriter, r *http.Request) {
+	router.Get("/accounts/{accountId}", func(w http.ResponseWriter, r *http.Request) {
 		accountInfo, err := accountCtrl.GetAccount(r)
+		responseWriter.Write(200, accountInfo, err, w)
+	})
+	router.Put("/accounts/{accountId}", func(w http.ResponseWriter, r *http.Request) {
+		accountInfo, err := accountCtrl.UpdateAccount(r)
 		responseWriter.Write(200, accountInfo, err, w)
 	})
 }

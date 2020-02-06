@@ -21,17 +21,6 @@ type (
 		DeletedAt *time.Time `json:"deletedAt"`
 	}
 
-	// //AccountInfo is an account model, but without password
-	// AccountInfo struct {
-	// 	ID        string     `json:id`
-	// 	Name      string     `json:name`
-	// 	Email     string     `json:email`
-	// 	Phone     string     `json:phone`
-	// 	CreatedAt time.Time  `json:createdAt`
-	// 	UpdatedAt *time.Time `json:updatedAt`
-	// 	DeletedAt *time.Time `json:deletedAt`
-	// }
-
 	//Registrant represent a registrant data model who wants to register as a new account
 	Registrant struct {
 		Name     string
@@ -133,6 +122,9 @@ func (me *Service) UpdateAccount(ctx context.Context, updateRequest *UpdateReque
 	existingAccount, err := me.accountRepo.GetByID(ctx, updateRequest.ID)
 	if err != nil {
 		return nil, err
+	}
+	if existingAccount == nil {
+		return nil, errors.NewAppError("Account with id '" + updateRequest.ID + "' is not found")
 	}
 
 	existingAccount.Name = updateRequest.Name
