@@ -3,10 +3,10 @@ package endpoint
 import (
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/supendi/orderan.api/core/account"
 	"github.com/supendi/orderan.api/pkg/httphelper"
-
-	"github.com/go-chi/chi"
+	"github.com/supendi/orderan.api/pkg/validator"
 )
 
 //AccountController entry point and wrap account service for http layer
@@ -23,10 +23,22 @@ func NewAccountController(requestDecoder httphelper.RequestDecoder, accountServi
 	}
 }
 
+func (me *AccountController) decodeAndValidate(r *http.Request, model interface{}) error {
+	err := me.requestDecoder.Decode(r, model)
+	if err != nil {
+		return err
+	}
+	appErr := validator.Validate(model)
+	if appErr != nil {
+		return appErr
+	}
+	return nil
+}
+
 //RegisterAccount register new Account
 func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account, error) {
 	var registrant account.Registrant
-	err := me.requestDecoder.Decode(r, &registrant)
+	err := me.decodeAndValidate(r, &registrant)
 	if err != nil {
 		return nil, err
 	}

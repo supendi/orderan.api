@@ -23,10 +23,10 @@ type (
 
 	//Registrant represent a registrant data model who wants to register as a new account
 	Registrant struct {
-		Name     string
-		Email    string
-		Phone    string
-		Password string
+		Name     string `validate:"required"`
+		Email    string `validate:"required"`
+		Phone    string `validate:"required"`
+		Password string `validate:"required"`
 	}
 
 	//UpdateRequest represent account update request model
