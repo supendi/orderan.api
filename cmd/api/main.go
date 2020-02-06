@@ -9,6 +9,7 @@ import (
 	"github.com/supendi/orderan.api/core/account/inmem"
 
 	"github.com/supendi/orderan.api/pkg/httphelper"
+	"github.com/supendi/orderan.api/pkg/validator"
 )
 
 func main() {
@@ -16,7 +17,7 @@ func main() {
 	hasher := account.NewBCryptHasher()
 	accountRepo := inmem.NewAccountRepository([]*account.Account{})
 	accountService := account.NewAccountService(accountRepo, hasher)
-	accountController := accountEndpoint.NewAccountController(&httphelper.RequestHandler{}, accountService)
+	accountController := accountEndpoint.NewAccountController(&httphelper.RequestHandler{}, &validator.ModelValidator{}, accountService)
 	accountEndpoint.RegisterRoutes(r, &httphelper.ResponseHandler{}, accountController)
 
 	http.ListenAndServe(":8080", r)

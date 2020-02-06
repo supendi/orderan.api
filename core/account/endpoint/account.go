@@ -11,34 +11,24 @@ import (
 
 //AccountController entry point and wrap account service for http layer
 type AccountController struct {
-	requestDecoder httphelper.RequestDecoder
+	decoder        httphelper.RequestDecoder
+	validator      validator.Validator
 	accountService *account.Service
 }
 
 //NewAccountController returns a new account http instance
-func NewAccountController(requestDecoder httphelper.RequestDecoder, accountService *account.Service) *AccountController {
+func NewAccountController(decoder httphelper.RequestDecoder, validator validator.Validator, accountService *account.Service) *AccountController {
 	return &AccountController{
-		requestDecoder: requestDecoder,
+		decoder:        decoder,
+		validator:      validator,
 		accountService: accountService,
 	}
-}
-
-func (me *AccountController) decodeAndValidate(r *http.Request, model interface{}) error {
-	err := me.requestDecoder.Decode(r, model)
-	if err != nil {
-		return err
-	}
-	appErr := validator.Validate(model)
-	if appErr != nil {
-		return appErr
-	}
-	return nil
 }
 
 //RegisterAccount register new Account
 func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account, error) {
 	var registrant account.Registrant
-	err := me.decodeAndValidate(r, &registrant)
+	err := me.decoder.DecodeAndValidate(r, &registrant)
 	if err != nil {
 		return nil, err
 	}
@@ -49,18 +39,26 @@ func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account,
 //GetAccount gets an existing Account
 func (me *AccountController) GetAccount(r *http.Request) (*account.Account, error) {
 	getRequest := &account.GetRequest{}
-	getRequest.AccountID = me.requestDecoder.URLParam(r, "accountId")
+	getRequest.AccountID = me.decoder.URLParam(r, "accountId")
+	err := me.validator.Validate(getRequest)
+	if err != nil {
+		return nil, err
+	}
 	return me.accountService.GetAccount(r.Context(), getRequest)
 }
 
 //UpdateAccount updates an existing account
 func (me *AccountController) UpdateAccount(r *http.Request) (*account.Account, error) {
 	var updateRequest account.UpdateRequest
-	err := me.requestDecoder.Decode(r, &updateRequest)
+	err := me.decoder.Decode(r, &updateRequest)
 	if err != nil {
 		return nil, err
 	}
-	updateRequest.AccountID = me.requestDecoder.URLParam(r, "accountId")
+	updateRequest.AccountID = me.decoder.URLParam(r, "accountId")
+	err = me.validator.Validate(&updateRequest)
+	if err != nil {
+		return nil, err
+	}
 	return me.accountService.UpdateAccount(r.Context(), &updateRequest)
 }
 

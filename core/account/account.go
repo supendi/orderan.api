@@ -31,13 +31,13 @@ type (
 
 	//UpdateRequest represent account update request model
 	UpdateRequest struct {
-		AccountID string
-		Name      string
+		AccountID string `validate:"required"`
+		Name      string `validate:"required"`
 	}
 
 	//GetRequest represent account get request model
 	GetRequest struct {
-		AccountID string
+		AccountID string `validate:"required"`
 	}
 )
 

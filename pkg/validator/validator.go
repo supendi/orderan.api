@@ -7,6 +7,15 @@ import (
 	"github.com/supendi/orderan.api/pkg/errors"
 )
 
+//Validator Specify the validator functionalities
+type Validator interface {
+	Validate(model interface{}) error
+}
+
+//ModelValidator implements Validator
+type ModelValidator struct {
+}
+
 //Construct a more readable error message from validation errors
 func contructMessage(fieldName string, tag string, param interface{}) string {
 	errorMessage := ""
@@ -26,15 +35,16 @@ func contructMessage(fieldName string, tag string, param interface{}) string {
 	return errorMessage
 }
 
-//Validate validates validate struct tag
-func Validate(model interface{}) *errors.AppError {
+//Validate validates a struct tag
+func (me *ModelValidator) Validate(model interface{}) error {
 	err := govalidator.New().Struct(model)
 	if err == nil {
 		return nil
 	}
-	appError := errors.NewAppError("Validation error(s) occured.")
+	var appError *errors.AppError
 	validationErrors := err.(govalidator.ValidationErrors)
 	if validationErrors != nil {
+		appError = errors.NewAppError("Validation error(s) occured.")
 		for _, goError := range validationErrors {
 			errMessage := contructMessage(goError.StructField(), goError.Tag(), goError.Param())
 			appError.Errors.Add(errors.NewFieldError(goError.StructField(), errMessage))
