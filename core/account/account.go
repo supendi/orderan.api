@@ -31,13 +31,13 @@ type (
 
 	//UpdateRequest represent account update request model
 	UpdateRequest struct {
-		ID   string
-		Name string
+		AccountID string
+		Name      string
 	}
 
 	//GetRequest represent account get request model
 	GetRequest struct {
-		ID string
+		AccountID string
 	}
 )
 
@@ -119,12 +119,12 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 
 //UpdateAccount updates an existing account, but only its name will be updated
 func (me *Service) UpdateAccount(ctx context.Context, updateRequest *UpdateRequest) (*Account, error) {
-	existingAccount, err := me.accountRepo.GetByID(ctx, updateRequest.ID)
+	existingAccount, err := me.accountRepo.GetByID(ctx, updateRequest.AccountID)
 	if err != nil {
 		return nil, err
 	}
 	if existingAccount == nil {
-		return nil, errors.NewAppError("Account with id '" + updateRequest.ID + "' is not found")
+		return nil, errors.NewAppError("Account with id '" + updateRequest.AccountID + "' is not found")
 	}
 
 	existingAccount.Name = updateRequest.Name
@@ -138,12 +138,12 @@ func (me *Service) UpdateAccount(ctx context.Context, updateRequest *UpdateReque
 
 //GetAccount gets an account by its ID
 func (me *Service) GetAccount(ctx context.Context, request *GetRequest) (*Account, error) {
-	existingAccount, err := me.accountRepo.GetByID(ctx, request.ID)
+	existingAccount, err := me.accountRepo.GetByID(ctx, request.AccountID)
 	if err != nil {
 		return nil, err
 	}
 	if existingAccount == nil {
-		return nil, errors.NewAppError("Account with id '" + request.ID + "' is not found")
+		return nil, errors.NewAppError("Account with id '" + request.AccountID + "' is not found")
 	}
 
 	return existingAccount, nil

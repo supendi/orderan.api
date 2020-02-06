@@ -37,7 +37,7 @@ func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account,
 //GetAccount gets an existing Account
 func (me *AccountController) GetAccount(r *http.Request) (*account.Account, error) {
 	getRequest := &account.GetRequest{}
-	getRequest.ID = me.requestDecoder.URLParam(r, "accountId")
+	getRequest.AccountID = me.requestDecoder.URLParam(r, "accountId")
 	return me.accountService.GetAccount(r.Context(), getRequest)
 }
 
@@ -48,7 +48,7 @@ func (me *AccountController) UpdateAccount(r *http.Request) (*account.Account, e
 	if err != nil {
 		return nil, err
 	}
-	updateRequest.ID = me.requestDecoder.URLParam(r, "accountId")
+	updateRequest.AccountID = me.requestDecoder.URLParam(r, "accountId")
 	return me.accountService.UpdateAccount(r.Context(), &updateRequest)
 }
 
