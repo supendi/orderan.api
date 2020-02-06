@@ -7,6 +7,27 @@ import (
 	"github.com/supendi/orderan.api/pkg/errors"
 )
 
+//DuplicateEmailError returns app err with duplicate email message
+func DuplicateEmailError(email string) error {
+	appErr := errors.NewAppError("Validation error(s) occured.")
+	appErr.Errors.Add(errors.NewFieldError("email", "Email '"+email+"' is already registered."))
+	return appErr
+}
+
+//DuplicatePhoneError returns app err with duplicate phone message
+func DuplicatePhoneError(phone string) error {
+	appErr := errors.NewAppError("Validation error(s) occured.")
+	appErr.Errors.Add(errors.NewFieldError("phone", "Phone '"+phone+"' is already registered."))
+	return appErr
+}
+
+//AccountNotFoundError return app err with account not found message
+func AccountNotFoundError(usernameOrAccountID string) error {
+	appErr := errors.NewAppError("Validation error(s) occured.")
+	appErr.Errors.Add(errors.NewFieldError("accountId", "Account '"+usernameOrAccountID+"' is not found"))
+	return appErr
+}
+
 //Models
 type (
 	//Account represent account entity model
@@ -80,9 +101,7 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 		return nil, err
 	}
 	if existingAccount != nil {
-		appErr := errors.NewAppError("Validation error(s) occured.")
-		appErr.Errors.Add(errors.NewFieldError("email", "Email '"+registrant.Email+"' is already registered."))
-		return nil, appErr
+		return nil, DuplicateEmailError(registrant.Email)
 	}
 
 	existingAccount, err = me.accountRepo.GetByPhone(ctx, registrant.Phone)
@@ -90,9 +109,7 @@ func (me *Service) RegisterAccount(ctx context.Context, registrant *Registrant) 
 		return nil, err
 	}
 	if existingAccount != nil {
-		appErr := errors.NewAppError("Validation error(s) occured.")
-		appErr.Errors.Add(errors.NewFieldError("phone", "Phone '"+registrant.Phone+"' is already registered."))
-		return nil, appErr
+		return nil, DuplicatePhoneError(registrant.Phone)
 	}
 
 	newAccount := &Account{
@@ -124,9 +141,7 @@ func (me *Service) UpdateAccount(ctx context.Context, updateRequest *UpdateReque
 		return nil, err
 	}
 	if existingAccount == nil {
-		appErr := errors.NewAppError("Validation error(s) occured.")
-		appErr.Errors.Add(errors.NewFieldError("accountId", "Account with id '"+updateRequest.AccountID+"' is not found"))
-		return nil, appErr
+		return nil, AccountNotFoundError(updateRequest.AccountID)
 	}
 
 	existingAccount.Name = updateRequest.Name
