@@ -10,7 +10,7 @@ type TokenHandler interface {
 	GenerateAccessToken(signKey string, claims jwt.Claims) (string, error)
 	GenerateRefreshToken() string
 	GetClaimValue(accessToken string, claimKey string, jwtKey string) (string, error)
-	Verify(accessToken string) (bool, error)
+	Verify(accessToken string, jwtKey string) bool
 }
 
 //JWTTokenHandler implement token handler
@@ -19,7 +19,8 @@ type JWTTokenHandler struct{}
 //GenerateAccessToken generate a signed token string
 func (me *JWTTokenHandler) GenerateAccessToken(signKey string, claims jwt.Claims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString(signKey)
+	jwtKey := []byte(signKey)
+	signedToken, err := token.SignedString(jwtKey)
 	if err != nil {
 		return "", err
 	}
@@ -41,4 +42,15 @@ func (me *JWTTokenHandler) GetClaimValue(accessToken string, claimKey string, jw
 	}
 	claimValue := token.Claims.(jwt.MapClaims)[claimKey].(string)
 	return claimValue, nil
+}
+
+//Verify verifies that a JWT is valid
+func (me *JWTTokenHandler) Verify(accessToken string, jwtKey string) bool {
+	_, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtKey), nil
+	})
+	if err != nil {
+		return false
+	}
+	return true
 }
