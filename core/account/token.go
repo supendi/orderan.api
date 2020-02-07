@@ -1,7 +1,6 @@
 package account
 
 import (
-	"context"
 	"os"
 	"time"
 
@@ -9,7 +8,7 @@ import (
 	"github.com/supendi/orderan.api/pkg/security"
 )
 
-var jwtKey string
+var jwtKey string = ""
 
 func getJWTkey() string {
 	if jwtKey == "" {
@@ -24,7 +23,7 @@ func getJWTkey() string {
 //Claims custome claims to be encrypted
 type Claims struct {
 	jwt.StandardClaims
-	AccountID string `json:accountId`
+	AccountID string `json:"accountId"`
 	Email     string `json:"username"`
 	Phone     string `json:"phone"`
 }
@@ -48,7 +47,7 @@ func NewTokenService(tokenHandler security.TokenHandler) *TokenService {
 }
 
 //GenerateTokenInfo Generates a new token info
-func (me *TokenService) GenerateTokenInfo(ctx context.Context, account *Account) (*TokenInfo, error) {
+func (me *TokenService) GenerateTokenInfo(account *Account) (*TokenInfo, error) {
 	tokenExpireTime := time.Duration(1) * time.Hour
 	claims := Claims{
 		StandardClaims: jwt.StandardClaims{
@@ -76,4 +75,9 @@ func (me *TokenService) GenerateTokenInfo(ctx context.Context, account *Account)
 //GetAccountID Generates a new token info
 func (me *TokenService) GetAccountID(accessToken string) (string, error) {
 	return me.tokenHandler.GetClaimValue(accessToken, "accountId", getJWTkey())
+}
+
+//Verify verifies if a token is a valid one
+func (me *TokenService) Verify(accessToken string) bool {
+	return me.tokenHandler.Verify(accessToken, getJWTkey())
 }

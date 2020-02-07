@@ -40,17 +40,20 @@ func (me *JWTTokenHandler) GetClaimValue(accessToken string, claimKey string, jw
 	if err != nil {
 		return "", err
 	}
-	claimValue := token.Claims.(jwt.MapClaims)[claimKey].(string)
-	return claimValue, nil
+	claimValue := token.Claims.(jwt.MapClaims)[claimKey]
+	if claimValue != nil {
+		return claimValue.(string), nil
+	}
+	return "", nil
 }
 
 //Verify verifies that a JWT is valid
 func (me *JWTTokenHandler) Verify(accessToken string, jwtKey string) bool {
-	_, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtKey), nil
 	})
 	if err != nil {
 		return false
 	}
-	return true
+	return token.Valid
 }

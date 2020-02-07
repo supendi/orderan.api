@@ -98,7 +98,7 @@ func (me *AuthService) Authenticate(ctx context.Context, req *LoginRequest) (*To
 		return nil, AuthError()
 	}
 
-	tokenInfo, err := me.tokenService.GenerateTokenInfo(ctx, existingAccount)
+	tokenInfo, err := me.tokenService.GenerateTokenInfo(existingAccount)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (me *AuthService) RenewAccessToken(ctx context.Context, req *RenewTokenRequ
 		return nil, AccountNotFoundError(accountID)
 	}
 
-	tokenInfo, err := me.tokenService.GenerateTokenInfo(ctx, existingAccount)
+	tokenInfo, err := me.tokenService.GenerateTokenInfo(existingAccount)
 	now := time.Now()
 	_, err = me.tokenRepository.Add(ctx, &Token{
 		AccessToken:    tokenInfo.AccessToken,
