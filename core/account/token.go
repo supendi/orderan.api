@@ -24,7 +24,7 @@ func getJWTkey() string {
 type Claims struct {
 	jwt.StandardClaims
 	AccountID string `json:"accountId"`
-	Email     string `json:"username"`
+	Email     string `json:"email"`
 	Phone     string `json:"phone"`
 }
 
