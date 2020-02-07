@@ -40,6 +40,13 @@ type TokenService struct {
 	tokenHandler security.TokenHandler
 }
 
+//NewTokenService return new TokenService instance
+func NewTokenService(tokenHandler security.TokenHandler) *TokenService {
+	return &TokenService{
+		tokenHandler: tokenHandler,
+	}
+}
+
 //GenerateTokenInfo Generates a new token info
 func (me *TokenService) GenerateTokenInfo(ctx context.Context, account *Account) (*TokenInfo, error) {
 	tokenExpireTime := time.Duration(1) * time.Hour
