@@ -20,7 +20,7 @@ func getJWTkey() string {
 	return jwtKey
 }
 
-//Claims custome claims to be encrypted
+//Claims custom claims to be encrypted
 type Claims struct {
 	jwt.StandardClaims
 	AccountID string `json:"accountId"`
