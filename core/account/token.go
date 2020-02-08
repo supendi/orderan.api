@@ -1,6 +1,7 @@
 package account
 
 import (
+	"context"
 	"os"
 	"time"
 
@@ -36,18 +37,20 @@ type TokenInfo struct {
 
 //TokenService implements TokenGenerator
 type TokenService struct {
-	tokenHandler security.TokenHandler
+	tokenRepository TokenRepository
+	tokenHandler    security.TokenHandler
 }
 
 //NewTokenService return new TokenService instance
-func NewTokenService(tokenHandler security.TokenHandler) *TokenService {
+func NewTokenService(tokenRepository TokenRepository, tokenHandler security.TokenHandler) *TokenService {
 	return &TokenService{
-		tokenHandler: tokenHandler,
+		tokenRepository: tokenRepository,
+		tokenHandler:    tokenHandler,
 	}
 }
 
-//GenerateTokenInfo Generates a new token info
-func (me *TokenService) GenerateTokenInfo(account *Account) (*TokenInfo, error) {
+//GenerateTokenInfo Generates a new token info and save it into storage
+func (me *TokenService) GenerateTokenInfo(ctx context.Context, account *Account) (*TokenInfo, error) {
 	tokenExpireTime := time.Duration(1) * time.Hour
 	claims := Claims{
 		StandardClaims: jwt.StandardClaims{
@@ -69,7 +72,22 @@ func (me *TokenService) GenerateTokenInfo(account *Account) (*TokenInfo, error) 
 		RefreshToken: refreshToken,
 	}
 
+	now := time.Now()
+	_, err = me.tokenRepository.Add(ctx, &Token{
+		AccessToken:    tokenInfo.AccessToken,
+		RefreshToken:   tokenInfo.RefreshToken,
+		RequestedCount: 0,
+		Blacklisted:    false,
+		CreatedAt:      now,
+		ExpiredAt:      now.Add(time.Duration(120) * time.Hour), //5 days
+	})
+
 	return tokenInfo, nil
+}
+
+//GetByRefreshToken get token record from storage by refresh token
+func (me *TokenService) GetByRefreshToken(ctx context.Context, refreshToken string) (*Token, error) {
+	return me.tokenRepository.GetByRefreshToken(ctx, refreshToken)
 }
 
 //GetAccountID Generates a new token info

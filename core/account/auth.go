@@ -68,7 +68,6 @@ type (
 type AuthService struct {
 	tokenService      TokenService
 	accountRepository Repository
-	tokenRepository   TokenRepository
 	passwordHasher    PasswordHasher
 }
 
@@ -98,20 +97,10 @@ func (me *AuthService) Authenticate(ctx context.Context, req *LoginRequest) (*To
 		return nil, AuthError()
 	}
 
-	tokenInfo, err := me.tokenService.GenerateTokenInfo(existingAccount)
+	tokenInfo, err := me.tokenService.GenerateTokenInfo(ctx, existingAccount)
 	if err != nil {
 		return nil, err
 	}
-
-	now := time.Now()
-	_, err = me.tokenRepository.Add(ctx, &Token{
-		AccessToken:    tokenInfo.AccessToken,
-		RefreshToken:   tokenInfo.RefreshToken,
-		RequestedCount: 0,
-		Blacklisted:    false,
-		CreatedAt:      now,
-		ExpiredAt:      now.Add(time.Duration(120) * time.Hour), //5 days
-	})
 
 	if err != nil {
 		return nil, err
@@ -121,7 +110,7 @@ func (me *AuthService) Authenticate(ctx context.Context, req *LoginRequest) (*To
 
 //RenewAccessToken renew access token by profiding its access token and its refresh token
 func (me *AuthService) RenewAccessToken(ctx context.Context, req *RenewTokenRequest) (*TokenInfo, error) {
-	existingToken, err := me.tokenRepository.GetByRefreshToken(ctx, req.RefreshToken)
+	existingToken, err := me.tokenService.GetByRefreshToken(ctx, req.RefreshToken)
 	if err != nil {
 		return nil, err
 	}
@@ -150,16 +139,7 @@ func (me *AuthService) RenewAccessToken(ctx context.Context, req *RenewTokenRequ
 		return nil, AccountNotFoundError(accountID)
 	}
 
-	tokenInfo, err := me.tokenService.GenerateTokenInfo(existingAccount)
-	now := time.Now()
-	_, err = me.tokenRepository.Add(ctx, &Token{
-		AccessToken:    tokenInfo.AccessToken,
-		RefreshToken:   tokenInfo.RefreshToken,
-		RequestedCount: existingToken.RequestedCount + 1,
-		Blacklisted:    false,
-		CreatedAt:      now,
-		ExpiredAt:      now.Add(time.Duration(120) * time.Hour), //5 days
-	})
+	tokenInfo, err := me.tokenService.GenerateTokenInfo(ctx, existingAccount)
 
 	if err != nil {
 		return nil, err

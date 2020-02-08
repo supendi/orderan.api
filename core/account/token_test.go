@@ -1,16 +1,21 @@
-package account
+package account_test
 
 import (
+	"context"
 	"testing"
 
+	"github.com/supendi/orderan.api/core/account"
+	"github.com/supendi/orderan.api/core/account/inmem"
 	"github.com/supendi/orderan.api/pkg/identity"
 	"github.com/supendi/orderan.api/pkg/security"
 )
 
 func TestGenerateTokenInfo(t *testing.T) {
 	newAccountID := identity.NewID("A_")
-	service := NewTokenService(&security.JWTTokenHandler{})
-	tokenInfo, err := service.GenerateTokenInfo(&Account{
+	tokenRepo := inmem.NewTokenRepository([]*account.Token{})
+	service := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{})
+	newContext := context.Background()
+	tokenInfo, err := service.GenerateTokenInfo(newContext, &account.Account{
 		ID:    newAccountID,
 		Email: "irpan@gmail.com",
 		Phone: "0813",
@@ -27,12 +32,20 @@ func TestGenerateTokenInfo(t *testing.T) {
 	if tokenInfo.RefreshToken == "" {
 		t.Fatal("Refresh token shouldnt be an empty string")
 	}
+	tokenInStorage, err := tokenRepo.GetByRefreshToken(newContext, tokenInfo.RefreshToken)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if tokenInStorage == nil {
+		t.Fatal("tokenInStorage shouldnt be nil")
+	}
 }
 
 func TestGetAccountID(t *testing.T) {
 	newAccountID := identity.NewID("A_")
-	service := NewTokenService(&security.JWTTokenHandler{})
-	tokenInfo, err := service.GenerateTokenInfo(&Account{
+	service := account.NewTokenService(inmem.NewTokenRepository([]*account.Token{}), &security.JWTTokenHandler{})
+	newContext := context.Background()
+	tokenInfo, err := service.GenerateTokenInfo(newContext, &account.Account{
 		ID:    newAccountID,
 		Email: "irpan@gmail.com",
 		Phone: "0813",
@@ -60,8 +73,9 @@ func TestGetAccountID(t *testing.T) {
 
 func TestVerify(t *testing.T) {
 	newAccountID := identity.NewID("A_")
-	service := NewTokenService(&security.JWTTokenHandler{})
-	tokenInfo, err := service.GenerateTokenInfo(&Account{
+	service := account.NewTokenService(inmem.NewTokenRepository([]*account.Token{}), &security.JWTTokenHandler{})
+	newContext := context.Background()
+	tokenInfo, err := service.GenerateTokenInfo(newContext, &account.Account{
 		ID:    newAccountID,
 		Email: "irpan@gmail.com",
 		Phone: "0813",
