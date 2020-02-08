@@ -16,8 +16,8 @@ type Validator interface {
 type ModelValidator struct {
 }
 
-//Construct a more readable error message from validation errors
-func contructMessage(fieldName string, tag string, param interface{}) string {
+//constructMessage create a more readable error message from validation errors
+func constructMessage(fieldName string, tag string, param interface{}) string {
 	errorMessage := ""
 	if param == nil {
 		param = ""
@@ -46,7 +46,7 @@ func (me *ModelValidator) Validate(model interface{}) error {
 	if validationErrors != nil {
 		appError = errors.NewAppError("Validation error(s) occured.")
 		for _, goError := range validationErrors {
-			errMessage := contructMessage(goError.StructField(), goError.Tag(), goError.Param())
+			errMessage := constructMessage(goError.StructField(), goError.Tag(), goError.Param())
 			appError.Errors.Add(errors.NewFieldError(goError.StructField(), errMessage))
 		}
 	}
