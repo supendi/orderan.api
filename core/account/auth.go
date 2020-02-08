@@ -155,7 +155,7 @@ func (me *AuthService) RenewAccessToken(ctx context.Context, req *RenewTokenRequ
 	_, err = me.tokenRepository.Add(ctx, &Token{
 		AccessToken:    tokenInfo.AccessToken,
 		RefreshToken:   tokenInfo.RefreshToken,
-		RequestedCount: 0,
+		RequestedCount: existingToken + 1,
 		Blacklisted:    false,
 		CreatedAt:      now,
 		ExpiredAt:      now.Add(time.Duration(120) * time.Hour), //5 days
