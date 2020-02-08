@@ -17,7 +17,7 @@ type AccountController struct {
 	accountService *account.Service
 }
 
-//NewAccountController returns a new account http instance
+//NewAccountController returns a new account controller instance. Its only wrapping account service, providing service method from decoded http request to required param type
 func NewAccountController(decoder httphelper.RequestDecoder, validator validator.Validator, accountService *account.Service) *AccountController {
 	return &AccountController{
 		decoder:        decoder,
