@@ -28,7 +28,7 @@ func (me *JWTAuthMiddleware) HandlerFunc(next http.Handler) http.Handler {
 			return
 		}
 		jwtToken := strings.ReplaceAll(authToken, "Bearer ", "")
-		if me.tokenHandler.Verify(jwtToken, me.jwtKey) {
+		if !me.tokenHandler.Verify(jwtToken, me.jwtKey) {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}

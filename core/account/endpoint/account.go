@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/supendi/orderan.api/core/account"
 	"github.com/supendi/orderan.api/pkg/httphelper"
+	"github.com/supendi/orderan.api/pkg/security"
 	"github.com/supendi/orderan.api/pkg/validator"
 )
 
@@ -69,7 +70,9 @@ func RegisterAccountRoutes(router *chi.Mux, responseWriter httphelper.ResponseWr
 		responseWriter.Write(200, accountInfo, err, w)
 	})
 	router.Group(func(r chi.Router) {
-		//r.Use(mw)
+		//TODO: inject jwt key
+		authMiddleware := security.NewJWTAuthMiddleware("PengenTinggalDiBandungBrooo", &security.JWTTokenHandler{})
+		r.Use(authMiddleware.HandlerFunc)
 		r.Get("/accounts/{accountId}", func(w http.ResponseWriter, request *http.Request) {
 			accountInfo, err := accountCtrl.GetAccount(request)
 			responseWriter.Write(200, accountInfo, err, w)
