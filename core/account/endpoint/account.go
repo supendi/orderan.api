@@ -29,7 +29,7 @@ func NewAccountController(decoder httphelper.RequestDecoder, validator validator
 //RegisterAccount register new Account
 func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account, error) {
 	var registrant account.Registrant
-	err := me.decoder.DecodeAndValidate(r, &registrant)
+	err := me.decoder.DecodeBodyAndValidate(r, &registrant)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (me *AccountController) RegisterAccount(r *http.Request) (*account.Account,
 //GetAccount gets an existing Account
 func (me *AccountController) GetAccount(r *http.Request) (*account.Account, error) {
 	getRequest := &account.GetRequest{}
-	getRequest.AccountID = me.decoder.URLParam(r, "accountId")
+	getRequest.AccountID = me.decoder.DecodeURLParam(r, "accountId")
 	err := me.validator.Validate(getRequest)
 	if err != nil {
 		return nil, err
@@ -51,11 +51,11 @@ func (me *AccountController) GetAccount(r *http.Request) (*account.Account, erro
 //UpdateAccount updates an existing account
 func (me *AccountController) UpdateAccount(r *http.Request) (*account.Account, error) {
 	var updateRequest account.UpdateRequest
-	err := me.decoder.Decode(r, &updateRequest)
+	err := me.decoder.DecodeBody(r, &updateRequest)
 	if err != nil {
 		return nil, err
 	}
-	updateRequest.AccountID = me.decoder.URLParam(r, "accountId")
+	updateRequest.AccountID = me.decoder.DecodeURLParam(r, "accountId")
 	err = me.validator.Validate(&updateRequest)
 	if err != nil {
 		return nil, err

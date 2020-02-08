@@ -28,7 +28,7 @@ func NewAuthController(decoder httphelper.RequestDecoder, validator validator.Va
 //Authenticate Authenticates user
 func (me *AuthController) Authenticate(r *http.Request) (*account.TokenInfo, error) {
 	var loginRequest account.LoginRequest
-	err := me.decoder.DecodeAndValidate(r, &loginRequest)
+	err := me.decoder.DecodeBodyAndValidate(r, &loginRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (me *AuthController) Authenticate(r *http.Request) (*account.TokenInfo, err
 //RenewAccessToken renew access token
 func (me *AuthController) RenewAccessToken(r *http.Request) (*account.TokenInfo, error) {
 	var req account.RenewTokenRequest
-	err := me.decoder.DecodeAndValidate(r, &req)
+	err := me.decoder.DecodeBodyAndValidate(r, &req)
 	if err != nil {
 		return nil, err
 	}

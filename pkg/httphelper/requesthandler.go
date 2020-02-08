@@ -10,24 +10,24 @@ import (
 
 //RequestDecoder decode http request to a spesific model
 type RequestDecoder interface {
-	Decode(r *http.Request, decodeTo interface{}) error
-	DecodeAndValidate(r *http.Request, model interface{}) error
-	URLParam(r *http.Request, key string) string
+	DecodeBody(r *http.Request, decodeTo interface{}) error
+	DecodeBodyAndValidate(r *http.Request, model interface{}) error
+	DecodeURLParam(r *http.Request, key string) string
 }
 
 //RequestHandler implements RequestDecoder
 type RequestHandler struct {
 }
 
-//Decode decode request body into specified param
-func (me *RequestHandler) Decode(r *http.Request, decodeTo interface{}) error {
+//DecodeBody decode request body into specified param
+func (me *RequestHandler) DecodeBody(r *http.Request, decodeTo interface{}) error {
 	err := json.NewDecoder(r.Body).Decode(decodeTo)
 	return err
 }
 
-//DecodeAndValidate decode the request body, and then validates the struct
-func (me *RequestHandler) DecodeAndValidate(r *http.Request, model interface{}) error {
-	err := me.Decode(r, model)
+//DecodeBodyAndValidate decode the request body, and then validates the struct
+func (me *RequestHandler) DecodeBodyAndValidate(r *http.Request, model interface{}) error {
+	err := me.DecodeBody(r, model)
 	if err != nil {
 		return err
 	}
@@ -39,7 +39,7 @@ func (me *RequestHandler) DecodeAndValidate(r *http.Request, model interface{}) 
 	return nil
 }
 
-//URLParam decode URL param by specified key
-func (me *RequestHandler) URLParam(r *http.Request, key string) string {
+//DecodeURLParam decode URL param by specified key
+func (me *RequestHandler) DecodeURLParam(r *http.Request, key string) string {
 	return chi.URLParam(r, key)
 }
