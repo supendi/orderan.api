@@ -39,12 +39,13 @@ func (me *TokenRepository) Blacklist(ctx context.Context, tokenID string) (*acco
 
 //Delete deletes existing token
 func (me *TokenRepository) Delete(ctx context.Context, tokenID string) error {
-	// for _, token := range me.tokenList {
-	// 	if token.ID == tokenID {
-	// 		token.Blacklisted = true
-	// 		return token
-	// 	}
-	// }
+	for i := 0; i < len(me.tokenList); i++ {
+		token := me.tokenList[i]
+		if token.ID == tokenID {
+			me.tokenList = append(me.tokenList[:i], me.tokenList[i+1:]...)
+			return nil
+		}
+	}
 	return nil
 }
 
