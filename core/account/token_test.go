@@ -13,7 +13,7 @@ import (
 func TestGenerateTokenInfo(t *testing.T) {
 	newAccountID := identity.NewID("A_")
 	tokenRepo := inmem.NewTokenRepository([]*account.Token{})
-	service := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{})
+	service := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{}, "SECRETKEY")
 	newContext := context.Background()
 	tokenInfo, err := service.GenerateTokenInfo(newContext, &account.Account{
 		ID:    newAccountID,
@@ -43,7 +43,7 @@ func TestGenerateTokenInfo(t *testing.T) {
 
 func TestGetAccountID(t *testing.T) {
 	newAccountID := identity.NewID("A_")
-	service := account.NewTokenService(inmem.NewTokenRepository([]*account.Token{}), &security.JWTTokenHandler{})
+	service := account.NewTokenService(inmem.NewTokenRepository([]*account.Token{}), &security.JWTTokenHandler{}, "SECRETKEY")
 	newContext := context.Background()
 	tokenInfo, err := service.GenerateTokenInfo(newContext, &account.Account{
 		ID:    newAccountID,
@@ -73,7 +73,7 @@ func TestGetAccountID(t *testing.T) {
 
 func TestVerify(t *testing.T) {
 	newAccountID := identity.NewID("A_")
-	service := account.NewTokenService(inmem.NewTokenRepository([]*account.Token{}), &security.JWTTokenHandler{})
+	service := account.NewTokenService(inmem.NewTokenRepository([]*account.Token{}), &security.JWTTokenHandler{}, "SECRETKEY")
 	newContext := context.Background()
 	tokenInfo, err := service.GenerateTokenInfo(newContext, &account.Account{
 		ID:    newAccountID,

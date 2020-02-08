@@ -2,24 +2,11 @@ package account
 
 import (
 	"context"
-	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/supendi/orderan.api/pkg/security"
 )
-
-var jwtKey string = ""
-
-func getJWTkey() string {
-	if jwtKey == "" {
-		jwtKey = os.Getenv("JWT_KEY")
-		if jwtKey == "" {
-			jwtKey = "PengenTinggalDiBandungBrooo"
-		}
-	}
-	return jwtKey
-}
 
 //Claims custom claims to be encrypted
 type Claims struct {
@@ -39,13 +26,15 @@ type TokenInfo struct {
 type TokenService struct {
 	tokenRepository TokenRepository
 	tokenHandler    security.TokenHandler
+	jwtKey          string
 }
 
 //NewTokenService return new TokenService instance
-func NewTokenService(tokenRepository TokenRepository, tokenHandler security.TokenHandler) *TokenService {
+func NewTokenService(tokenRepository TokenRepository, tokenHandler security.TokenHandler, jwtKey string) *TokenService {
 	return &TokenService{
 		tokenRepository: tokenRepository,
 		tokenHandler:    tokenHandler,
+		jwtKey:          jwtKey,
 	}
 }
 
@@ -60,7 +49,7 @@ func (me *TokenService) GenerateTokenInfo(ctx context.Context, account *Account)
 		Email:     account.Email,
 		Phone:     account.Phone,
 	}
-	accessToken, err := me.tokenHandler.GenerateAccessToken(getJWTkey(), claims)
+	accessToken, err := me.tokenHandler.GenerateAccessToken(me.jwtKey, claims)
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +81,10 @@ func (me *TokenService) GetByRefreshToken(ctx context.Context, refreshToken stri
 
 //GetAccountID Generates a new token info
 func (me *TokenService) GetAccountID(accessToken string) (string, error) {
-	return me.tokenHandler.GetClaimValue(accessToken, "accountId", getJWTkey())
+	return me.tokenHandler.GetClaimValue(accessToken, "accountId", me.jwtKey)
 }
 
 //Verify verifies if a token is a valid one
 func (me *TokenService) Verify(accessToken string) bool {
-	return me.tokenHandler.Verify(accessToken, getJWTkey())
+	return me.tokenHandler.Verify(accessToken, me.jwtKey)
 }

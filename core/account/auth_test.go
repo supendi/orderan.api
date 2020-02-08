@@ -31,7 +31,7 @@ func TestAuthenticate(t *testing.T) {
 
 	//Test authentication
 	tokenRepo := inmem.NewTokenRepository([]*account.Token{})
-	tokenService := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{})
+	tokenService := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{}, "SECRETKEY")
 	authService := account.NewAuthService(tokenService, GetAccountRepo(), account.NewBCryptHasher())
 	tokenInfo, err := authService.Authenticate(newContext, &account.LoginRequest{
 		Username: registrant.Email,
@@ -74,7 +74,7 @@ func TestAuthenticateFailed(t *testing.T) {
 
 	//Test authentication
 	tokenRepo := inmem.NewTokenRepository([]*account.Token{})
-	tokenService := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{})
+	tokenService := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{}, "SECRETKEY")
 	authService := account.NewAuthService(tokenService, GetAccountRepo(), account.NewBCryptHasher())
 	tokenInfo, err := authService.Authenticate(newContext, &account.LoginRequest{
 		Username: registrant.Email,
@@ -111,7 +111,7 @@ func TestRenewAccessToken(t *testing.T) {
 
 	//Test authentication
 	tokenRepo := inmem.NewTokenRepository([]*account.Token{})
-	tokenService := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{})
+	tokenService := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{}, "SECRETKEY")
 	authService := account.NewAuthService(tokenService, GetAccountRepo(), account.NewBCryptHasher())
 	tokenInfo, err := authService.Authenticate(newContext, &account.LoginRequest{
 		Username: registrant.Email,
