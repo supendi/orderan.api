@@ -21,7 +21,7 @@ func InvalidTokenError() error {
 
 //ExpiredTokenError returns app err with expired token message
 func ExpiredTokenError() error {
-	appErr := errors.NewAppError("Refresh token is already expired.")
+	appErr := errors.NewAppError("Refresh token is expired.")
 	return appErr
 }
 
