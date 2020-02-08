@@ -31,8 +31,8 @@ type Claims struct {
 
 //TokenInfo represent the response model when user successfully authenticated
 type TokenInfo struct {
-	AccessToken  string
-	RefreshToken string
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 //TokenService implements TokenGenerator

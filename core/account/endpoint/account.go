@@ -62,8 +62,8 @@ func (me *AccountController) UpdateAccount(r *http.Request) (*account.Account, e
 	return me.accountService.UpdateAccount(r.Context(), &updateRequest)
 }
 
-//RegisterRoutes register all account routes
-func RegisterRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, accountCtrl *AccountController) {
+//RegisterAccountRoutes register all account routes
+func RegisterAccountRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, accountCtrl *AccountController) {
 	router.Post("/accounts", func(w http.ResponseWriter, r *http.Request) {
 		accountInfo, err := accountCtrl.RegisterAccount(r)
 		responseWriter.Write(200, accountInfo, err, w)
