@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
+	"github.com/supendi/orderan.api/pkg/errors"
 	"github.com/supendi/orderan.api/pkg/validator"
 )
 
@@ -22,7 +23,20 @@ type RequestHandler struct {
 //DecodeBody decode request body into specified param
 func (me *RequestHandler) DecodeBody(r *http.Request, decodeTo interface{}) error {
 	err := json.NewDecoder(r.Body).Decode(decodeTo)
-	return err
+	if err != nil {
+		if err.Error() == "EOF" {
+			return &errors.AppError{
+				Message: "Your request missing JSON body",
+			}
+		}
+		if err.Error() == "unexpected EOF" {
+			return &errors.AppError{
+				Message: "Your request has an invalid JSON",
+			}
+		}
+		return err
+	}
+	return nil
 }
 
 //DecodeBodyAndValidate decode the request body, and then validates the struct

@@ -43,7 +43,12 @@ func WriteResponse(httpStatus int, v interface{}, w http.ResponseWriter) {
 
 	w.WriteHeader(httpStatus)
 	w.Write(jsonBody)
+}
 
+//FormattedError just wrap unknown error
+type FormattedError struct {
+	Message string   `json:"message"`
+	Errors  []*error `json:"errors"`
 }
 
 //ErrorResponse write error response
@@ -53,6 +58,9 @@ func ErrorResponse(err error, w http.ResponseWriter) {
 			WriteResponse(400, err, w)
 			return
 		}
-		WriteResponse(500, err, w)
+		WriteResponse(500, &FormattedError{
+			Message: err.Error(),
+			Errors:  []*error{},
+		}, w)
 	}
 }
