@@ -64,15 +64,15 @@ func (me *AccountController) UpdateAccount(r *http.Request) (*account.Account, e
 }
 
 //RegisterAccountRoutes register all account routes
-func RegisterAccountRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, accountCtrl *AccountController) {
+func RegisterAccountRoutes(router *chi.Mux, responseWriter httphelper.ResponseWriter, tokenHandler security.TokenHandler, jwtKey string, accountCtrl *AccountController) {
 	router.Post("/accounts", func(w http.ResponseWriter, r *http.Request) {
 		accountInfo, err := accountCtrl.RegisterAccount(r)
 		responseWriter.Write(200, accountInfo, err, w)
 	})
 	router.Group(func(r chi.Router) {
 		//TODO: inject jwt key
-		authMiddleware := security.NewJWTAuthMiddleware("PengenTinggalDiBandungBrooo", &security.JWTTokenHandler{})
-		r.Use(authMiddleware.HandlerFunc)
+		authMiddleware := security.NewJWTAuthMiddleware(tokenHandler, jwtKey)
+		r.Use(authMiddleware)
 		r.Get("/accounts/{accountId}", func(w http.ResponseWriter, request *http.Request) {
 			accountInfo, err := accountCtrl.GetAccount(request)
 			responseWriter.Write(200, accountInfo, err, w)

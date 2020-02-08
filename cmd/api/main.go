@@ -15,18 +15,24 @@ import (
 )
 
 func main() {
+	jwtKey := "PengenTinggalDiBandungBrooo"
+	requestHandler := &httphelper.RequestHandler{}
+	responseHandler := &httphelper.ResponseHandler{}
+	modelValidator := &validator.ModelValidator{}
+	tokenHandler := &security.JWTTokenHandler{}
 	r := chi.NewRouter()
 	hasher := account.NewBCryptHasher()
+
 	accountRepo := inmem.NewAccountRepository([]*account.Account{})
 	accountService := account.NewAccountService(accountRepo, hasher)
-	accountController := accountEndpoint.NewAccountController(&httphelper.RequestHandler{}, &validator.ModelValidator{}, accountService)
-	accountEndpoint.RegisterAccountRoutes(r, &httphelper.ResponseHandler{}, accountController)
+	accountController := accountEndpoint.NewAccountController(requestHandler, modelValidator, accountService)
+	accountEndpoint.RegisterAccountRoutes(r, responseHandler, tokenHandler, jwtKey, accountController)
 
 	tokenRepo := inmem.NewTokenRepository([]*account.Token{})
-	tokenService := account.NewTokenService(tokenRepo, &security.JWTTokenHandler{})
+	tokenService := account.NewTokenService(tokenRepo, tokenHandler)
 	authService := account.NewAuthService(tokenService, accountRepo, hasher)
-	authController := accountEndpoint.NewAuthController(&httphelper.RequestHandler{}, &validator.ModelValidator{}, authService)
-	accountEndpoint.RegisterAuthRoutes(r, &httphelper.ResponseHandler{}, authController)
+	authController := accountEndpoint.NewAuthController(requestHandler, modelValidator, authService)
+	accountEndpoint.RegisterAuthRoutes(r, responseHandler, authController)
 
 	http.ListenAndServe(":8080", r)
 }
