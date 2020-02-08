@@ -71,6 +71,15 @@ type AuthService struct {
 	passwordHasher    PasswordHasher
 }
 
+//NewAuthService returns a new account service
+func NewAuthService(tokenService TokenService, accountRepository Repository, passwordHasher PasswordHasher) *AuthService {
+	return &AuthService{
+		tokenService:      tokenService,
+		accountRepository: accountRepositor,
+		passwordHasher:    passwordHasher,
+	}
+}
+
 //Authenticate authenticates user
 func (me *AuthService) Authenticate(ctx context.Context, req *LoginRequest) (*TokenInfo, error) {
 	//Find account by email first
