@@ -9,7 +9,7 @@ import (
 	"github.com/supendi/orderan.api/pkg/validator"
 )
 
-//RequestDecoder decode http request to a spesific model
+//RequestDecoder decode http request to a spesific model or type
 type RequestDecoder interface {
 	DecodeBody(r *http.Request, decodeTo interface{}) error
 	DecodeBodyAndValidate(r *http.Request, model interface{}) error
