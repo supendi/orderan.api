@@ -66,16 +66,16 @@ type (
 
 //AuthService specifies the functionalies user authentication
 type AuthService struct {
-	tokenService      TokenService
+	tokenService      *TokenService
 	accountRepository Repository
 	passwordHasher    PasswordHasher
 }
 
 //NewAuthService returns a new account service
-func NewAuthService(tokenService TokenService, accountRepository Repository, passwordHasher PasswordHasher) *AuthService {
+func NewAuthService(tokenService *TokenService, accountRepository Repository, passwordHasher PasswordHasher) *AuthService {
 	return &AuthService{
 		tokenService:      tokenService,
-		accountRepository: accountRepositor,
+		accountRepository: accountRepository,
 		passwordHasher:    passwordHasher,
 	}
 }
@@ -131,7 +131,7 @@ func (me *AuthService) RenewAccessToken(ctx context.Context, req *RenewTokenRequ
 		return nil, InvalidTokenError()
 	}
 
-	tokenIsExpired := existingToken.ExpiredAt.After(time.Now())
+	tokenIsExpired := time.Now().After(existingToken.ExpiredAt)
 	if tokenIsExpired {
 		return nil, ExpiredTokenError()
 	}
