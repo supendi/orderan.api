@@ -108,7 +108,7 @@ func (me *AuthService) Authenticate(ctx context.Context, req *LoginRequest) (*To
 	return tokenInfo, nil
 }
 
-//RenewAccessToken renew access token by profiding its access token and its refresh token
+//RenewAccessToken renew access token by providing its access token and its refresh token
 func (me *AuthService) RenewAccessToken(ctx context.Context, req *RenewTokenRequest) (*TokenInfo, error) {
 	existingToken, err := me.tokenService.GetByRefreshToken(ctx, req.RefreshToken)
 	if err != nil {
