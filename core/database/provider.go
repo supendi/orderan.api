@@ -28,15 +28,18 @@ func newDBContext(db *sqlx.DB) *dbx.Context {
 	return dbContext
 }
 
-//NewDBTest return a db test
-func NewDBTest() *sqlx.DB {
+//NewDBContextTest return a new orderan db context test
+func NewDBContextTest() *dbx.Context {
 	constring := env.GetDBTestConstring()
-	return newDB(constring)
+	db := newDB(constring)
+	dbContext := newDBContext(db)
+	return dbContext
 }
 
-//NewDBContextTest return a new db context test
-func NewDBContextTest() *dbx.Context {
-	db := NewDBTest()
+//NewDBContext return a new orderan db context
+func NewDBContext() *dbx.Context {
+	constring := env.GetDBConstring()
+	db := newDB(constring)
 	dbContext := newDBContext(db)
 	return dbContext
 }
