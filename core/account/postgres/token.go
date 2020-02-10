@@ -47,7 +47,21 @@ func (me *TokenRepository) Add(ctx context.Context, newToken *account.Token) (*a
 func (me *TokenRepository) Blacklist(ctx context.Context, tokenID string) error {
 	statement := dbx.NewStatement("UPDATE token SET blacklisted=true, updated_at = NOW() WHERE id = :id")
 	statement.AddParameter("id", tokenID)
+	me.db.AddStatement(statement)
+	_, err := me.db.SaveChanges(ctx)
 
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//Delete deletes an existing token by its ID
+func (me *TokenRepository) Delete(ctx context.Context, tokenID string) error {
+	statement := dbx.NewStatement("DELETE FROM token WHERE id = :id")
+	statement.AddParameter("id", tokenID)
+	me.db.AddStatement(statement)
 	_, err := me.db.SaveChanges(ctx)
 
 	if err != nil {
@@ -61,7 +75,7 @@ func (me *TokenRepository) Blacklist(ctx context.Context, tokenID string) error 
 func (me *TokenRepository) GetByID(ctx context.Context, id string) (*account.Token, error) {
 	statement := dbx.NewStatement("SELECT * FROM token WHERE id = :id")
 	statement.AddParameter("id", id)
-
+	me.db.AddStatement(statement)
 	rows, err := me.db.QueryStatementContext(ctx, statement)
 	if err != nil {
 		return nil, err
@@ -85,7 +99,7 @@ func (me *TokenRepository) GetByID(ctx context.Context, id string) (*account.Tok
 func (me *TokenRepository) GetByRefreshToken(ctx context.Context, refreshToken string) (*account.Token, error) {
 	statement := dbx.NewStatement("SELECT * FROM token WHERE refresh_token = :refresh_token")
 	statement.AddParameter("refresh_token", refreshToken)
-
+	me.db.AddStatement(statement)
 	rows, err := me.db.QueryStatementContext(ctx, statement)
 	if err != nil {
 		return nil, err
