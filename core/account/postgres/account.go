@@ -71,7 +71,7 @@ func (me *AccountRepository) GetByID(ctx context.Context, id string) (*account.A
 
 	for rows.Next() {
 		retrievedAccount = &account.Account{}
-		err := rows.Scan(&retrievedAccount.ID, &retrievedAccount.Name, &retrievedAccount.Email, &retrievedAccount.Phone, &retrievedAccount.Password, &retrievedAccount.CreatedAt, &retrievedAccount.UpdatedAt)
+		err := rows.Scan(&retrievedAccount.ID, &retrievedAccount.Name, &retrievedAccount.Email, &retrievedAccount.Phone, &retrievedAccount.Password, &retrievedAccount.CreatedAt, &retrievedAccount.UpdatedAt, &retrievedAccount.DeletedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -95,7 +95,7 @@ func (me *AccountRepository) GetByEmail(ctx context.Context, email string) (*acc
 
 	for rows.Next() {
 		retrievedAccount = &account.Account{}
-		err := rows.Scan(&retrievedAccount.ID, &retrievedAccount.Name, &retrievedAccount.Email, &retrievedAccount.Phone, &retrievedAccount.Password, &retrievedAccount.CreatedAt, &retrievedAccount.UpdatedAt)
+		err := rows.Scan(&retrievedAccount.ID, &retrievedAccount.Name, &retrievedAccount.Email, &retrievedAccount.Phone, &retrievedAccount.Password, &retrievedAccount.CreatedAt, &retrievedAccount.UpdatedAt, &retrievedAccount.DeletedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +119,7 @@ func (me *AccountRepository) GetByPhone(ctx context.Context, phone string) (*acc
 
 	for rows.Next() {
 		retrievedAccount = &account.Account{}
-		err := rows.Scan(&retrievedAccount.ID, &retrievedAccount.Name, &retrievedAccount.Email, &retrievedAccount.Phone, &retrievedAccount.Password, &retrievedAccount.CreatedAt, &retrievedAccount.UpdatedAt)
+		err := rows.Scan(&retrievedAccount.ID, &retrievedAccount.Name, &retrievedAccount.Email, &retrievedAccount.Phone, &retrievedAccount.Password, &retrievedAccount.CreatedAt, &retrievedAccount.UpdatedAt, &retrievedAccount.DeletedAt)
 		if err != nil {
 			return nil, err
 		}
