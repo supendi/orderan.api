@@ -79,7 +79,7 @@ func (me *TokenService) GetByRefreshToken(ctx context.Context, refreshToken stri
 	return me.tokenRepository.GetByRefreshToken(ctx, refreshToken)
 }
 
-//GetAccountID Generates a new token info
+//GetAccountID get account ID value from access token
 func (me *TokenService) GetAccountID(accessToken string) (string, error) {
 	return me.tokenHandler.GetClaimValue(accessToken, "accountId", me.jwtKey)
 }
