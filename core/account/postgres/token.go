@@ -75,7 +75,7 @@ func (me *TokenRepository) Delete(ctx context.Context, tokenID string) error {
 func (me *TokenRepository) GetByID(ctx context.Context, id string) (*account.Token, error) {
 	statement := dbx.NewStatement("SELECT * FROM token WHERE id = :id")
 	statement.AddParameter("id", id)
-	me.db.AddStatement(statement)
+
 	rows, err := me.db.QueryStatementContext(ctx, statement)
 	if err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (me *TokenRepository) GetByID(ctx context.Context, id string) (*account.Tok
 func (me *TokenRepository) GetByRefreshToken(ctx context.Context, refreshToken string) (*account.Token, error) {
 	statement := dbx.NewStatement("SELECT * FROM token WHERE refresh_token = :refresh_token")
 	statement.AddParameter("refresh_token", refreshToken)
-	me.db.AddStatement(statement)
+
 	rows, err := me.db.QueryStatementContext(ctx, statement)
 	if err != nil {
 		return nil, err

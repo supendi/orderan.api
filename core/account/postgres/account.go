@@ -31,6 +31,8 @@ func (me *AccountRepository) Add(ctx context.Context, newAccount *account.Accoun
 	statement.AddParameter("phone", newAccount.Phone)
 	statement.AddParameter("password", newAccount.Password)
 
+	me.db.AddStatement(statement)
+
 	_, err := me.db.SaveChanges(ctx)
 
 	if err != nil {
@@ -45,7 +47,7 @@ func (me *AccountRepository) Update(ctx context.Context, updatedAccount *account
 	statement := dbx.NewStatement("UPDATE account SET name=:name, updated_at = NOW() WHERE id=:id")
 	statement.AddParameter("id", updatedAccount.ID)
 	statement.AddParameter("name", updatedAccount.Name)
-
+	me.db.AddStatement(statement)
 	_, err := me.db.SaveChanges(ctx)
 
 	if err != nil {
