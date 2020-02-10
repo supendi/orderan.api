@@ -24,13 +24,15 @@ func NewTokenRepository(dbContext *dbx.Context) *TokenRepository {
 func (me *TokenRepository) Add(ctx context.Context, newToken *account.Token) (*account.Token, error) {
 	newToken.ID = uuid.New().String()
 
-	statement := dbx.NewStatement("INSERT INTO token(id, access_token, refresh_token, requested_count, blacklisted, expired_at, created_at) VALUES (:id, :access_token, :refresh_token, :requested_count, :blacklisted, :expired_at, NOW()")
+	statement := dbx.NewStatement("INSERT INTO token(id, access_token, refresh_token, requested_count, blacklisted, expired_at, created_at) VALUES (:id, :access_token, :refresh_token, :requested_count, :blacklisted, :expired_at, NOW())")
 	statement.AddParameter("id", newToken.ID)
 	statement.AddParameter("access_token", newToken.AccessToken)
 	statement.AddParameter("refresh_token", newToken.RefreshToken)
 	statement.AddParameter("requested_count", newToken.RequestedCount)
 	statement.AddParameter("blacklisted", newToken.Blacklisted)
 	statement.AddParameter("expired_at", newToken.ExpiredAt)
+
+	me.db.AddStatement(statement)
 
 	_, err := me.db.SaveChanges(ctx)
 
