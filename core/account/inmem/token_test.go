@@ -45,17 +45,18 @@ func TestBlacklistToken(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fetchedToken, err := tokenRepo.Blacklist(newContext, token.ID)
+	err = tokenRepo.Blacklist(newContext, token.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if fetchedToken == nil {
-		t.Fatal("fetchedToken shouldnt be nil")
+	blacklistedToken, err := tokenRepo.GetByID(newContext, token.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !blacklistedToken.Blacklisted {
+		t.Fatal("Token should be blacklisted")
 	}
 
-	if !fetchedToken.Blacklisted {
-		t.Fatal("fetchedToken should be blacklisted")
-	}
 }
 
 func TestDeleteToken(t *testing.T) {

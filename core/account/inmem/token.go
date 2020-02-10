@@ -27,14 +27,14 @@ func (me *TokenRepository) Add(ctx context.Context, token *account.Token) (*acco
 }
 
 //Blacklist set token blacklisted flag
-func (me *TokenRepository) Blacklist(ctx context.Context, tokenID string) (*account.Token, error) {
+func (me *TokenRepository) Blacklist(ctx context.Context, tokenID string) error {
 	for _, token := range me.tokenList {
 		if token.ID == tokenID {
 			token.Blacklisted = true
-			return token, nil
+			return nil
 		}
 	}
-	return nil, nil
+	return nil
 }
 
 //Delete deletes existing token

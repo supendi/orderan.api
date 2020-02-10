@@ -57,7 +57,7 @@ type (
 	//TokenRepository specifies the functionalities for working with token data storage
 	TokenRepository interface {
 		Add(ctx context.Context, token *Token) (*Token, error)
-		Blacklist(ctx context.Context, tokenID string) (*Token, error)
+		Blacklist(ctx context.Context, tokenID string) error
 		Delete(ctx context.Context, tokenID string) error
 		GetByID(ctx context.Context, tokenID string) (*Token, error)
 		GetByRefreshToken(ctx context.Context, refreshToken string) (*Token, error)
