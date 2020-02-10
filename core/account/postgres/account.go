@@ -42,7 +42,8 @@ func (me *AccountRepository) Add(ctx context.Context, newAccount *account.Accoun
 
 //Update updates an existing account in storage
 func (me *AccountRepository) Update(ctx context.Context, updatedAccount *account.Account) (*account.Account, error) {
-	statement := dbx.NewStatement("UPDATE account SET name=:name, updated_at = NOW()")
+	statement := dbx.NewStatement("UPDATE account SET name=:name, updated_at = NOW() WHERE id=:id")
+	statement.AddParameter("id", updatedAccount.ID)
 	statement.AddParameter("name", updatedAccount.Name)
 
 	_, err := me.db.SaveChanges(ctx)
